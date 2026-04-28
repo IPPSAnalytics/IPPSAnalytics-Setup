@@ -35,6 +35,40 @@ After generating the README, also check the following and report any issues:
 
 ---
 
+## Code Comments
+
+Apply these rules when adding or reviewing comments in SQL and notebook files:
+
+**SQL files (`Q-*.sql`, `P-*.sql`):**
+- Add a comment block at the top of every file with: project number, a one-line description of what the query does, and the key Oracle tables it touches
+- Add inline comments above any non-obvious JOIN conditions, WHERE filters, or subqueries
+- Do not comment self-explanatory column selections or standard boilerplate
+
+**Jupyter notebooks (`S-*.ipynb`, `main.ipynb`):**
+- The first cell should be a Markdown cell with: project number, notebook purpose, and inputs/outputs
+- Each major logical section (load, transform, export) should be preceded by a Markdown cell with a short section header
+- Add inline `#` comments only where the logic is non-obvious (e.g. a regex, a custom merge key, a workaround)
+- Do not add comments that just restate what the code obviously does
+
+---
+
+## Notebook to .py Conversion
+
+Convert `S-*.ipynb` notebooks to `.py` only when all of the following are true:
+- The notebook contains no visual outputs (no charts, no `display()` calls, no inline dataframe previews intended for human review)
+- The notebook is purely a data transformation or export script
+- The Confluence page does not describe it as a report or interactive analysis
+
+When converting:
+- Use standard `.py` format (not percent-format)
+- Preserve all Markdown cells as `#` comment blocks
+- Name the output file identically, replacing `.ipynb` with `.py`
+- Keep the original `.ipynb` until the `.py` version has been reviewed and confirmed
+
+If unsure whether a notebook qualifies, flag it for human review rather than converting automatically.
+
+---
+
 ## Tone & Style
 
 - Write in plain, professional English — not Confluence template language
