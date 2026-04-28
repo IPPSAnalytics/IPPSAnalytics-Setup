@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SUCCESS=0
 FAILED=0
 SKIPPED=0
@@ -9,6 +9,10 @@ echo "Updating all repos in IPPSAnalytics..."
 echo "======================================="
 
 for dir in "$ROOT"/*/; do
+  if [ "$(basename "$dir")" = "IPPSAnalytics-Setup" ]; then
+    continue
+  fi
+
   if [ ! -d "$dir/.git" ]; then
     SKIPPED=$((SKIPPED + 1))
     continue

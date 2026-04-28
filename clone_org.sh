@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ORG="IPPSAnalytics"
-DEST="${1:-$HOME/Desktop/$ORG}"
+DEST="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
 # Check for gh CLI
 if ! command -v gh &>/dev/null; then
@@ -34,6 +34,10 @@ SKIPPED=0
 FAILED=0
 
 while IFS= read -r repo; do
+  if [ "$repo" = "IPPSAnalytics-Setup" ]; then
+    continue
+  fi
+
   target="$DEST/$repo"
 
   if [ -d "$target/.git" ]; then
