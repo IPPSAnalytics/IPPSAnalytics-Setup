@@ -2,7 +2,39 @@
 
 This repo contains the setup scripts, Confluence sync tooling, and project standards for the IPPSAnalytics monorepo at UCSD's Integrated Procurement, Payment, and Supply (IPPS) department.
 
-The monorepo itself contains ~60 independent analytics projects. Each project lives in its own subfolder and Git repository. This setup repo provides the tools to manage them all from one place.
+The monorepo contains ~60 independent analytics projects. Each project lives in its own subfolder and Git repository. This setup repo provides the tools to manage them all from one place.
+
+---
+
+## Project Goals
+
+These are the documentation and quality standards this tooling is designed to enforce across every project:
+
+1. **Data flow documentation** — every project README should describe where data comes from, how it moves through the pipeline, and what it produces (e.g. `707-DM-SNOW_Cases`)
+2. **Inputs and outputs** — explicitly document what files or tables feed the script and what the expected output is
+3. **Code comments** — scripts should be readable to new team members; SQL and notebooks follow the comment rules in `project-standards.md`
+4. **Business logic** — tie each project to its Confluence page (same first 3 digits as the folder name); use the main project page for general context and meeting notes for recurring run history
+5. **Notebook to `.py` conversion** — pure transformation notebooks with no visual output are candidates for conversion; see `project-standards.md` for criteria
+6. **Field updates** — when new fields are added, the script and README are updated together
+
+---
+
+## How the Workflow Fits Together
+
+```
+Confluence (IPPS space)
+        │
+        │  sync_readmes.py --fetch-only
+        ▼
+  Project context (title, description, data sources, deliverables)
+        │
+        │  /sync-readme <project number>  (Claude Code slash command)
+        ▼
+  Claude reads project-standards.md + Confluence content + repo file list
+        │
+        ▼
+  README.md written, file/folder issues flagged
+```
 
 ---
 
@@ -27,7 +59,7 @@ Run the following from wherever you want your local workspace to live:
 ./clone_org.sh
 ```
 
-This will pull down every repository in the IPPSAnalytics GitHub organization into a single local folder. You only need to do this once.
+This pulls down every repository in the IPPSAnalytics GitHub organization into a single local folder. You only need to do this once.
 
 To specify a custom destination:
 
@@ -36,8 +68,6 @@ To specify a custom destination:
 ```
 
 ### Step 2 — Install Python Dependencies
-
-The Confluence sync tooling requires two Python packages:
 
 ```bash
 pip install -r requirements.txt
@@ -58,7 +88,7 @@ The `.env` file is gitignored and will never be committed.
 
 ### Step 4 — Stay Up to Date
 
-When you return to work after time away, or want to sync all projects with their latest changes from GitHub, run:
+When you return to work after time away, or want to sync all projects with their latest changes from GitHub:
 
 ```bash
 ./update_all.sh
@@ -108,36 +138,69 @@ This repo powers three Claude Code slash commands available anywhere in the work
 ### `/sync-readme [project number]`
 Generates or updates the `README.md` for a project. Pulls Confluence content, applies the README and file/folder rules from `project-standards.md`, and asks for confirmation before writing.
 
+When you run `/sync-readme 725`, Claude:
+1. Runs `sync_readmes.py --fetch-only 725` to pull the Confluence page for project 725
+2. Reads `project-standards.md` for the current rules
+3. Lists the actual files inside the `725-*` project folder
+4. Generates the README and reports any file/folder issues
+5. Asks whether to save, adjust, or move on
+
 ### `/audit-project [project number]`
 Performs a code-level audit of a project. Reads every SQL and notebook file, adds or fixes comments, and flags notebooks that qualify for conversion to `.py` — all per the rules in `project-standards.md`.
 
 ### `/full-review [project number]`
 Runs both of the above in sequence: README first, then file/folder checks, then code audit. Confirms with you at each step before making changes.
 
-**Example:**
 ```
 /full-review 725
 ```
 
 ---
 
-## Project Standards
+## How to Add or Change Rules
 
-`project-standards.md` is the single file that defines how Claude handles every project. It covers:
+Open `project-standards.md` and edit it directly. Examples:
 
-- **README structure** — required sections and how to populate them from Confluence
-- **File & folder checks** — naming conventions and required files
-- **Code comments** — rules for SQL headers and notebook Markdown cells
-- **Notebook conversion** — criteria for converting `.ipynb` to `.py`
-- **Tone & style** — writing guidelines
+- A new required README section (e.g. "Scheduling" for projects that run on a cron)
+- A new file convention check (e.g. "every project must have a `.gitignore`")
+- A rule about what to do when a Confluence page is missing
+- Instructions for how to handle a specific department's naming quirks
 
-Edit this file to change what gets checked or generated across all projects. No other files need to change.
+No other files need to change — the slash commands always read the latest version of `project-standards.md` at runtime.
 
 ---
 
-## Further Reading
+## Bulk Sync (Without Claude)
 
-See `HOW_IT_WORKS.md` for a detailed explanation of how all the pieces fit together, including a diagram of the full data flow from Confluence to README.
+To write READMEs for all matched projects at once without Claude's customization step:
+
+```bash
+# Preview all projects
+python sync_readmes.py --dry-run
+
+# Write READMEs for all matched projects
+python sync_readmes.py
+
+# Write README for one project
+python sync_readmes.py --project 725
+```
+
+This does a straight Confluence → Markdown dump without applying `project-standards.md`. Use the `/sync-readme` Claude workflow when you want intelligent, customized output.
+
+---
+
+## Confluence Space
+
+All project pages live in the **IPPS** space on UCSD Collab:
+`https://ucsdcollab.atlassian.net/wiki/spaces/IPPS/overview`
+
+Pages are matched to repo folders by project number (e.g. folder `725-DIS-PaymentWorks_Metrics_Supplier_Set_Up` matches any Confluence page whose title contains `725`). Common title formats:
+
+| Format | Example |
+|---|---|
+| `BI - [num] [name]` | `BI - 725 PaymentWorks Metrics and Supplier Set-Up` |
+| `OFC-[num] [name]` | `OFC-755 Payment Status to Payment Compass` |
+| `IPPS-[num] [name]` | `IPPS-602 Not Validated Invoices` |
 
 ---
 

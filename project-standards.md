@@ -11,7 +11,7 @@ Every project must have a `README.md` that contains the following sections in or
 
 1. **Title** — the project folder name as an H1 (e.g. `# 725-DIS-PaymentWorks_Metrics_Supplier_Set_Up`)
 2. **Overview** — 2–3 sentence plain-English summary of what the project does and who it serves; pull from the Confluence "Business Need" or "Project Goal" section; skip template placeholder text
-3. **Data Sources** — bullet list of input files or Oracle tables; pull from the Confluence "Data Source" section; skip blank placeholders
+3. **Data Sources** — bullet list of input files or Oracle tables; pull from the Confluence "Data Source" section; skip blank placeholders; for each file-based source, include the exact filename as referenced in the code (e.g. `R-725-Custom_Field.csv`)
 4. **Code Files** — bullet list of every file in the repo with a one-line description; infer the description from the file name convention:
    - `Q-*.sql` → Oracle query that extracts [what]
    - `S-*.ipynb` → Notebook that transforms/processes [what]
@@ -66,6 +66,19 @@ When converting:
 - Keep the original `.ipynb` until the `.py` version has been reviewed and confirmed
 
 If unsure whether a notebook qualifies, flag it for human review rather than converting automatically.
+
+---
+
+## Business Context File
+
+`IPPSAnalytics-Setup/business-context.md` is a running data dictionary of Oracle field meanings, hardcoded values, business logic, and domain facts discovered across all project repos. Use it when writing inline comments — if a magic value or non-obvious filter already has an entry, reference it. If you encounter something new and meaningful during a review (a field meaning, a hardcoded ID, a business rule baked into a WHERE clause), add it to the file under the appropriate section.
+
+Good candidates to add:
+- Hardcoded IDs or codes whose meaning isn't obvious from the name (e.g. `PRC_BU_ID = '300000002352016'`)
+- Business rules embedded in WHERE filters (e.g. exclusion lists, date thresholds)
+- Oracle table or field meanings that aren't self-evident
+- Cross-project dependencies (e.g. one project's output feeding another)
+- System or integration facts (e.g. how BI Publisher exports are structured)
 
 ---
 
