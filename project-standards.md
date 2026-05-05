@@ -52,20 +52,14 @@ Apply these rules when adding or reviewing comments in SQL and notebook files:
 
 ---
 
-## Notebook to .py Conversion
+## Scope of Changes
 
-Convert `S-*.ipynb` notebooks to `.py` only when all of the following are true:
-- The notebook contains no visual outputs (no charts, no `display()` calls, no inline dataframe previews intended for human review)
-- The notebook is purely a data transformation or export script
-- The Confluence page does not describe it as a report or interactive analysis
+Only modify documentation and comments. Never edit actual code or logic. Specifically:
 
-When converting:
-- Use standard `.py` format (not percent-format)
-- Preserve all Markdown cells as `#` comment blocks
-- Name the output file identically, replacing `.ipynb` with `.py`
-- Keep the original `.ipynb` until the `.py` version has been reviewed and confirmed
+- **Allowed:** `README.md` content, SQL header comment blocks, inline `--` comments in SQL, Markdown cells in notebooks, inline `#` comments in notebook code cells
+- **Not allowed:** SQL query logic, JOIN conditions, WHERE filters, SELECT columns, notebook data transformations, imports, file paths, or any line that affects what the code actually does
 
-If unsure whether a notebook qualifies, flag it for human review rather than converting automatically.
+If code logic appears wrong or could be improved, flag it in the review summary for a human to decide — do not change it.
 
 ---
 
